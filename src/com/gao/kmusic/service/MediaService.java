@@ -13,6 +13,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.gao.kmusic.ConstantValue;
+import com.gao.kmusic.util.HandlerManager;
 import com.gao.kmusic.util.MediaUtil;
 import com.gao.kmusic.util.PromptManager;
 
@@ -138,7 +139,7 @@ public class MediaService extends Service implements OnCompletionListener, OnSee
 
 	@Override
 	public void onCompletion(MediaPlayer arg0) {
-		//HandlerManager.getHandler().sendEmptyMessage(ConstantValue.PLAY_END);
+		HandlerManager.getHandler().sendEmptyMessage(ConstantValue.PLAY_END);
 	}
 
 	@Override

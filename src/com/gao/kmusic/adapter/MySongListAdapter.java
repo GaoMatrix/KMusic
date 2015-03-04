@@ -57,6 +57,8 @@ public class MySongListAdapter extends BaseAdapter {
         if (position == MediaUtil.CURRENTPOS
                 && (MediaUtil.PLAYSTATE == ConstantValue.OPTION_PAUSE || MediaUtil.PLAYSTATE == ConstantValue.OPTION_PLAY)) {
             holder.tx1.setTextColor(Color.GREEN);
+        } else {
+            holder.tx1.setTextColor(Color.WHITE);
         }
         holder.tx1.setTag(position);
 

@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.gao.kmusic.adapter.MySongListAdapter;
 import com.gao.kmusic.bean.Music;
@@ -50,6 +51,26 @@ public class MainActivity extends Activity {
                     PromptManager.closeProgressDialog();
                     mSongAdapter.notifyDataSetChanged();
                     unregisterReceiver(mScanReceiver);
+                    break;
+                case ConstantValue.PLAY_END:
+                    // 播放完成
+                    // 播放模式：单曲循环、顺序播放、循环播放、随机播放
+                    // 单曲循环:记录当前播放位置
+                    // 顺序播放:当前播放位置上＋1
+                    // 循环播放:判断如果，增加的结果大于songList的大小，修改播放位置为零
+                    // 随机播放:Random.nextInt() songList.size();
+
+                    MediaUtil.CURRENTPOS++;
+
+                    if (MediaUtil.CURRENTPOS < MediaUtil.getInstacen()
+                            .getSongList().size()) {
+                        Music music = MediaUtil.getInstacen().getSongList()
+                                .get(MediaUtil.CURRENTPOS);
+                        startPlayService(music, ConstantValue.OPTION_PLAY);
+                        changeNotice(Color.GREEN);
+
+                    }
+
                     break;
             }
         }
@@ -89,6 +110,45 @@ public class MainActivity extends Activity {
                         }
                         break;
                 }
+            }
+        });
+        
+        mPlayNextImageView.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // int temp=MediaUtil.CURRENTPOS;
+                if (MediaUtil.getInstacen().getSongList().size() > MediaUtil.CURRENTPOS + 1) {
+                    changeNotice(Color.WHITE);
+                    MediaUtil.CURRENTPOS++;
+                    startPlayService(
+                            MediaUtil.getInstacen().getSongList()
+                                    .get(MediaUtil.CURRENTPOS),
+                            ConstantValue.OPTION_PLAY);
+                    mPlayPauseImageView.setImageResource(R.drawable.img_playback_bt_play);
+                    MediaUtil.PLAYSTATE = ConstantValue.OPTION_PLAY;
+                    changeNotice(Color.GREEN);
+                }
+
+            }
+        });
+        mPlayPrevImageView.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (MediaUtil.CURRENTPOS > 0) {
+                    changeNotice(Color.WHITE);
+                    MediaUtil.CURRENTPOS--;
+                    startPlayService(
+                            MediaUtil.getInstacen().getSongList()
+                                    .get(MediaUtil.CURRENTPOS),
+                            ConstantValue.OPTION_PLAY);
+                    mPlayPauseImageView.setImageResource(R.drawable.img_playback_bt_play);
+                    MediaUtil.PLAYSTATE = ConstantValue.OPTION_PLAY;
+
+                    changeNotice(Color.GREEN);
+                }
+
             }
         });
     }
@@ -140,6 +200,14 @@ public class MainActivity extends Activity {
         sendBroadcast(new Intent(
                 Intent.ACTION_MEDIA_MOUNTED,
                 Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+    }
+    
+    private void changeNotice(int color) {
+        TextView tx = (TextView) mSongListView
+                .findViewWithTag(MediaUtil.CURRENTPOS);
+        if (tx != null) {
+            tx.setTextColor(color);
+        }
     }
 
     private void initMediaController() {
